@@ -17,16 +17,8 @@ createServal({
       path: '/hello',
       methods() {
         return {
-          '/world': createControllerMethod<
-            { test: string },
-            { test: string; data: string }
-          >({
+          '/world': createControllerMethod({
             type: 'get',
-            preRequestHandler: async () => {
-              return {
-                test: 'Test',
-              };
-            },
             async handler({ errorHandler }) {
               return {
                 message: 'Hello world!',
