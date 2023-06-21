@@ -1,8 +1,4 @@
-import {
-  createHttpErrorHandler,
-  HttpErrorHandler,
-  HttpException,
-} from '@/http-error';
+import { createHttpErrorHandler, HttpErrorHandler } from '@/http-error';
 import { Logger } from '@/logger';
 import type { ServalConfig } from '@/main';
 import type {
@@ -191,7 +187,7 @@ function wrapControllerMethod<
   PreRequestHandlerResult = unknown,
   ReturnType = unknown,
 >(
-  controller: ControllerConfig,
+  _controller: ControllerConfig,
   path: string,
   logger: Logger,
   methodName: string,
@@ -205,75 +201,31 @@ function wrapControllerMethod<
     place: name ? name : path,
     logger,
   });
-  const fullPath = controller.path + path;
+  // const fullPath = controller.path + path;
 
   return {
     type: config.type,
     path,
     fastifyRouteOptions: config.options || {},
     handler: async (request, replay) => {
-      try {
-        let preRequestHandlerResult: PreRequestHandlerResult = {} as never;
-        if (config.preRequestHandler) {
-          preRequestHandlerResult = await config.preRequestHandler({
-            logger,
-            errorHandler,
-            name,
-            request,
-            replay,
-          });
-        }
-        return await config.handler({
+      let preRequestHandlerResult: PreRequestHandlerResult = {} as never;
+      if (config.preRequestHandler) {
+        preRequestHandlerResult = await config.preRequestHandler({
           logger,
           errorHandler,
+          name,
           request,
           replay,
-          name,
-          ...preRequestHandlerResult,
         });
-        // if (handlerResult) {
-        //   return handlerResult;
-        // }
-        // if (handlerResult instanceof Buffer) {
-        //   replay.send(handlerResult);
-        // } else if (typeof handlerResult === 'object') {
-        //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //   const obj = handlerResult as any;
-        //   if (typeof obj.__file !== 'undefined') {
-        //     response.sendFile(obj.__file);
-        //     return;
-        //   } else {
-        //     response.json(obj);
-        //     return;
-        //   }
-        // } else {
-        //   response.status(200);
-        //   response.send(handlerResult);
-        // }
-        // response.end();
-      } catch (error) {
-        const exception = error as HttpException;
-        if (exception.status && exception.message) {
-          logger.warn(fullPath, error);
-          if (typeof exception.message === 'object') {
-            replay.code(exception.status).send(exception.message);
-          } else {
-            replay.code(exception.status).send({ message: exception.message });
-          }
-        } else {
-          logger.error(fullPath, {
-            method: request.method,
-            path: request.url,
-            error: {
-              message: (error as Error).message,
-              stack: (error as Error).stack
-                ? ((error as Error).stack as string).split('\n')
-                : '',
-            },
-          });
-          replay.code(500).send({ message: 'Unknown exception' });
-        }
       }
+      return await config.handler({
+        logger,
+        errorHandler,
+        request,
+        replay,
+        name,
+        ...preRequestHandlerResult,
+      });
     },
   };
 }

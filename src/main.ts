@@ -2,7 +2,7 @@ import * as Fastify from 'fastify';
 import * as FastifyMiddie from '@fastify/middie';
 import type { Server } from 'http';
 import { ConsoleColors, Logger, LoggerConfig } from './logger';
-import { HttpStatus } from './http-error';
+import { HttpException, HttpStatus } from './http-error';
 import type { Controller, Middleware } from './rest';
 import type { Module } from './module';
 
@@ -90,6 +90,37 @@ export async function createServal(config: ServalConfig) {
           const method = methods[j];
           const path = (data.path + method.path).replace(/\/\//g, '/');
           logger.info('controller', `    --> ${path}`);
+          if (!method.fastifyRouteOptions.errorHandler) {
+            method.fastifyRouteOptions.errorHandler = async (
+              error,
+              request,
+              replay,
+            ) => {
+              const exception = error as unknown as HttpException;
+              if (exception.status && exception.message) {
+                logger.warn(request.url, error);
+                if (typeof exception.message === 'object') {
+                  replay.code(exception.status).send(exception.message);
+                } else {
+                  replay
+                    .code(exception.status)
+                    .send({ message: exception.message });
+                }
+              } else {
+                logger.error(request.url, {
+                  method: request.method,
+                  path: request.url,
+                  error: {
+                    message: (error as Error).message,
+                    stack: (error as Error).stack
+                      ? ((error as Error).stack as string).split('\n')
+                      : '',
+                  },
+                });
+                replay.code(500).send({ message: 'Unknown exception' });
+              }
+            };
+          }
           fastify[method.type](
             path,
             method.fastifyRouteOptions,
@@ -228,11 +259,9 @@ export async function createServal(config: ServalConfig) {
             if (!config.logs || !config.logs.silentLogger) {
               // eslint-disable-next-line no-console
               console.log(`
-              ${ConsoleColors.FgMagenta}Serval${
-                ConsoleColors.Reset
-              } - ${ConsoleColors.FgGreen}Started Successfully${
-                ConsoleColors.Reset
-              }
+              ${ConsoleColors.FgMagenta}Serval${ConsoleColors.Reset} - ${
+                ConsoleColors.FgGreen
+              }Started Successfully${ConsoleColors.Reset}
               -------------------------------------             
               PORT: ${config.server.port}
               PID: ${process.pid}
