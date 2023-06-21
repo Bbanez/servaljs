@@ -1,5 +1,6 @@
-import type { Logger } from '@/logger';
+import { Logger } from '@/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { createHttpErrorHandler, HttpErrorHandler, HttpException } from '..';
 
 export interface MiddlewareHandler {
   (
@@ -20,10 +21,6 @@ export interface MiddlewareConfig {
    */
   path?: string;
   /**
-   * Should middleware be mounted before mounting controllers or after.
-   */
-  after?: boolean;
-  /**
    * Business logic implementation.
    */
   handler(data: {
@@ -36,13 +33,10 @@ export interface MiddlewareConfig {
      */
     path: string;
     /**
-     * Is middleware mounting before or after mounting the controllers.
-     */
-    after: boolean;
-    /**
      * Generated middleware logger.
      */
     logger: Logger;
+    errorHandler: HttpErrorHandler;
   }): MiddlewareHandler | Promise<MiddlewareHandler>;
 }
 
@@ -51,6 +45,73 @@ export type Middleware = () => MiddlewareData;
 export interface MiddlewareData {
   name: string;
   path: string;
-  after: boolean;
   handler(): MiddlewareHandler | Promise<MiddlewareHandler>;
+}
+
+/**
+ * Will create a middleware object using specified configuration.
+ */
+export function createMiddleware(config: MiddlewareConfig): Middleware {
+  let path = '/';
+  if (config.path) {
+    path = config.path.startsWith('/') ? config.path : '/' + config.path;
+  }
+  const logger = new Logger(config.name);
+  const errorHandler = createHttpErrorHandler({
+    logger,
+    place: '',
+  });
+  return () => {
+    return {
+      path,
+      name: config.name,
+      handler: async () => {
+        const handler = await config.handler({
+          name: config.name,
+          path,
+          logger,
+          errorHandler,
+        });
+        return async (request, response, next) => {
+          try {
+            await handler(request, response, next);
+          } catch (error) {
+            const exception = error as HttpException;
+            if (exception.status && exception.message) {
+              logger.warn(request.url || '', error);
+              if (typeof exception.message === 'object') {
+                response.statusCode = exception.status;
+                response.setHeader('Content-Type', 'application/json');
+                response.write(JSON.stringify(exception.message));
+                response.end();
+                return;
+              } else {
+                response.statusCode = exception.status;
+                response.setHeader('Content-Type', 'application/json');
+                response.write(JSON.stringify({ message: exception.message }));
+                response.end();
+                return;
+              }
+            } else {
+              logger.error(request.url || '', {
+                method: request.method,
+                path: request.url,
+                error: {
+                  message: (error as Error).message,
+                  stack: (error as Error).stack
+                    ? ((error as Error).stack as string).split('\n')
+                    : '',
+                },
+              });
+              response.statusCode = 500;
+              response.setHeader('Content-Type', 'application/json');
+              response.write(JSON.stringify({ message: 'Unknown exception' }));
+              response.end();
+              return;
+            }
+          }
+        };
+      },
+    };
+  };
 }
