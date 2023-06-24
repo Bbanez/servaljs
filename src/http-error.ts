@@ -1,3 +1,4 @@
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Logger } from './logger';
 
 export class HttpStatus {
@@ -126,4 +127,33 @@ export function createHttpErrorHandler(
       logger: config.logger,
     },
   );
+}
+
+export function defaultHttpErrorHandler(
+  error: unknown,
+  request: FastifyRequest,
+  replay: FastifyReply,
+  logger: Logger,
+) {
+  const exception = error as unknown as HttpException;
+  if (exception.status && exception.message) {
+    logger.warn(request.url, error);
+    if (typeof exception.message === 'object') {
+      replay.code(exception.status).send(exception.message);
+    } else {
+      replay.code(exception.status).send({ message: exception.message });
+    }
+  } else {
+    logger.error(request.url, {
+      method: request.method,
+      path: request.url,
+      error: {
+        message: (error as Error).message,
+        stack: (error as Error).stack
+          ? ((error as Error).stack as string).split('\n')
+          : '',
+      },
+    });
+    replay.code(500).send({ message: 'Unknown exception' });
+  }
 }

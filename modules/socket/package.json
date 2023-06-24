@@ -1,7 +1,7 @@
 {
-  "name": "servaljs",
-  "version": "0.1.2",
-  "description": "ServalJS is a toolset for FastifyJS",
+  "name": "servaljs-socket",
+  "version": "0.0.1",
+  "description": "ServalJS socket module",
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
@@ -19,13 +19,17 @@
     "test:unit": "mocha -r ts-node/register src/test/unit/*.test.ts --recursive --exit",
     "test:active:unit": "mocha -r ts-node/register src/test/unit/*.active.test.ts --recursive --exit",
     "lint": "eslint . --ext .ts",
-    "t": "ts-node -r tsconfig-paths/register src/test/integration/basic.test.ts"
+    "t": "nodemon -r tsconfig-paths/register src/test.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bbanez/servaljs.git"
   },
-  "keywords": [],
+  "keywords": [
+    "fastify",
+    "socket",
+    "websocket"
+  ],
   "author": "Branislav Vajagić",
   "license": "MIT",
   "bugs": {
@@ -33,17 +37,13 @@
   },
   "homepage": "https://github.com/bbanez/servaljs",
   "peerDependencies": {
-    "fastify": ">=4.18.0",
-    "@fastify/middie": "^8.3.0"
-  },
-  "dependencies": {
-    "@banez/fs": "^1.0.3",
-    "@banez/string-utility": "^1.0.1"
+    "@fastify/websocket": ">=8.1.0"
   },
   "devDependencies": {
     "@banez/child_process": "^1.0.3",
     "@banez/npm-tool": "^1.0.1",
     "@fastify/middie": "^8.3.0",
+    "@fastify/websocket": "^8.1.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^9.1.1",
     "@types/node": "^20.3.1",

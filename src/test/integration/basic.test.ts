@@ -1,11 +1,11 @@
-import { HttpStatus } from '@/http-error';
-import { createLogger } from '@/index';
-import { createServal } from '@/main';
+import { HttpStatus } from '@servaljs/http-error';
+import { createLogger } from '@servaljs/logger';
+import { createServal } from '@servaljs/main';
 import {
   createController,
   createControllerMethod,
   createMiddleware,
-} from '@/rest';
+} from '@servaljs/rest';
 
 async function main() {
   createServal({

@@ -1,6 +1,6 @@
-import { createHttpErrorHandler, HttpErrorHandler } from '@/http-error';
-import { Logger } from '@/logger';
-import type { ServalConfig } from '@/main';
+import { createHttpErrorHandler, HttpErrorHandler } from '@servaljs/http-error';
+import { Logger } from '@servaljs/logger';
+import type { ServalConfig } from '@servaljs/main';
 import type {
   FastifyInstance,
   FastifyReply,

@@ -1,6 +1,6 @@
-import { Logger } from '@/logger';
+import { Logger } from '@servaljs/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { createHttpErrorHandler, HttpErrorHandler, HttpException } from '..';
+import { createHttpErrorHandler, HttpErrorHandler, HttpException } from '../http-error';
 
 export interface MiddlewareHandler {
   (
@@ -76,7 +76,7 @@ export function createMiddleware(config: MiddlewareConfig): Middleware {
           try {
             await handler(request, response, next);
           } catch (error) {
-            const exception = error as HttpException;
+            const exception = error as unknown as HttpException;
             if (exception.status && exception.message) {
               logger.warn(request.url || '', error);
               if (typeof exception.message === 'object') {

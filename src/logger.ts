@@ -1,6 +1,5 @@
 import { createFS } from '@banez/fs';
 import * as path from 'path';
-import { HttpException } from './http-error';
 import * as nodeFs from 'fs/promises';
 import { StringUtility } from '@banez/string-utility';
 import type { Module } from './module';
@@ -241,21 +240,20 @@ export class Logger {
   info(place: string, message: unknown) {
     let print = '';
     if (typeof message === 'object') {
-      print = `\r\n${ConsoleColors.FgWhite}${JSON.stringify(
-        message,
-        circularReplacer(),
-        2,
-      )}${ConsoleColors.Reset}`;
+      if (message instanceof Error) {
+        print = `\r\n${ConsoleColors.FgYellow}${
+          message.stack ? message.stack : `${message.name}: ${message.message}`
+        }${ConsoleColors.Reset}`;
+      } else {
+        print = `\r\n${ConsoleColors.FgWhite}${JSON.stringify(
+          message,
+          circularReplacer(),
+          2,
+        )}${ConsoleColors.Reset}`;
+      }
     } else {
       print = message as string;
     }
-    // const o: string[] = [
-    //   `${ConsoleColors.FgWhite}[INFO]${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.FgMagenta}${place}${ConsoleColors.Reset}`,
-    //   '>',
-    //   print,
-    // ];
     toOutput(
       this.infoMsg.replace('@place', place).replace('@print', print),
       'log',
@@ -265,21 +263,20 @@ export class Logger {
   warn(place: string, message: unknown) {
     let print = '';
     if (typeof message === 'object') {
-      print = `\r\n${ConsoleColors.FgYellow}${JSON.stringify(
-        message,
-        circularReplacer(),
-        2,
-      )}${ConsoleColors.Reset}`;
+      if (message instanceof Error) {
+        print = `\r\n${ConsoleColors.FgYellow}${
+          message.stack ? message.stack : `${message.name}: ${message.message}`
+        }${ConsoleColors.Reset}`;
+      } else {
+        print = `\r\n${ConsoleColors.FgYellow}${JSON.stringify(
+          message,
+          circularReplacer(),
+          2,
+        )}${ConsoleColors.Reset}`;
+      }
     } else {
       print = message as string;
     }
-    // const o = [
-    //   `${ConsoleColors.FgYellow}[WARN]${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.FgMagenta}${place}${ConsoleColors.Reset}`,
-    //   '>',
-    //   print,
-    // ];
     toOutput(
       this.warnMsg.replace('@place', place).replace('@print', print),
       'warn',
@@ -289,31 +286,20 @@ export class Logger {
   error(place: string, message: unknown) {
     let print = '';
     if (typeof message === 'object') {
-      let stack: string | undefined;
       if (message instanceof Error) {
-        stack = message.stack;
-      } else if (message instanceof HttpException) {
-        stack = message.stack.join('\n');
-      }
-      print = `\r\n${ConsoleColors.FgRed}${JSON.stringify(
-        message,
-        circularReplacer(),
-        '  ',
-      )}${ConsoleColors.Reset}`;
-      if (stack) {
-        print =
-          print + `\r\n${ConsoleColors.FgRed}${stack}${ConsoleColors.Reset}`;
+        print = `\r\n${ConsoleColors.FgYellow}${
+          message.stack ? message.stack : `${message.name}: ${message.message}`
+        }${ConsoleColors.Reset}`;
+      } else {
+        print = `\r\n${ConsoleColors.FgRed}${JSON.stringify(
+          message,
+          circularReplacer(),
+          '  ',
+        )}${ConsoleColors.Reset}`;
       }
     } else {
       print = message as string;
     }
-    // const o = [
-    //   `${ConsoleColors.BgRed}[ERROR]${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
-    //   `${ConsoleColors.FgMagenta}${place}${ConsoleColors.Reset}`,
-    //   '>',
-    //   print,
-    // ];
     toOutput(
       this.errMsg.replace('@place', place).replace('@print', print),
       'error',
