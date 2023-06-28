@@ -1,6 +1,9 @@
-import { createHttpErrorHandler, HttpErrorHandler } from '@servaljs/http-error';
-import { Logger } from '@servaljs/logger';
-import type { ServalConfig } from '@servaljs/main';
+import {
+  createHttpErrorHandler,
+  type HttpErrorHandler,
+} from 'servaljs/http-error';
+import { Logger } from 'servaljs/logger';
+import type { ServalConfig } from 'servaljs/main';
 import type {
   FastifyInstance,
   FastifyReply,
@@ -36,6 +39,7 @@ export interface ControllerMethodConfig<
    * Type of the HTTP request which will be handled by this controller method.
    */
   type: ControllerMethodType;
+  path?: string;
   /**
    * Method which will be called before `handler` method on each request.
    * Output from `preRequestHandler` method is available in `handler` method.
@@ -124,7 +128,7 @@ export type ControllerMethodRequestHandler<
 
 export interface ControllerMethods {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [path: string]: ControllerMethodConfig<any, any>;
+  [name: string]: ControllerMethodConfig<any, any>;
 }
 
 export interface ControllerConfig {
@@ -250,14 +254,20 @@ export function createController(config: ControllerConfig): Controller {
       const methodNames = Object.keys(configMethods);
       const methods: ControllerMethod[] = [];
       for (let i = 0; i < methodNames.length; i++) {
-        const path = methodNames[i];
-        const method = configMethods[path];
+        const methodName = methodNames[i];
+        const method = configMethods[methodName];
         methods.push(
-          wrapControllerMethod(config, path, logger, methodNames[i], {
-            type: method.type,
-            preRequestHandler: method.preRequestHandler,
-            handler: method.handler,
-          }),
+          wrapControllerMethod(
+            config,
+            method.path || '',
+            logger,
+            methodNames[i],
+            {
+              type: method.type,
+              preRequestHandler: method.preRequestHandler,
+              handler: method.handler,
+            },
+          ),
         );
       }
       return methods;

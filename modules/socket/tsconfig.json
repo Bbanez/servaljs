@@ -19,9 +19,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "servaljs": ["../../src"],
-      "servaljs/*": ["../../src/*"],
-      "@servaljs": ["../../src"],
-      "@servaljs/*": ["../../src/*"]
+      "servaljs/*": ["../../src/*"]
     }
   },
   "include": ["src", "../../src"]

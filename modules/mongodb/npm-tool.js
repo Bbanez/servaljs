@@ -19,11 +19,11 @@ module.exports = createConfig({
         title: 'Remove tests',
         task: async () => {
           await fs.deleteDir(['dist', 'src']);
-          const files = await fs.readdir(['dist', 'modules', 'socket', 'src']);
+          const files = await fs.readdir(['dist', 'modules', 'mongodb', 'src']);
           for (let i = 0; i < files.length; i++) {
             const file = files[i];
             await fs.move(
-              ['dist', 'modules', 'socket', 'src', file],
+              ['dist', 'modules', 'mongodb', 'src', file],
               ['dist', file],
             );
           }

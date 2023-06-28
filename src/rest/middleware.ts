@@ -1,6 +1,10 @@
-import { Logger } from '@servaljs/logger';
+import { Logger } from 'servaljs/logger';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { createHttpErrorHandler, HttpErrorHandler, HttpException } from '../http-error';
+import {
+  createHttpErrorHandler,
+  type HttpErrorHandler,
+  HttpException,
+} from '../http-error';
 
 export interface MiddlewareHandler {
   (

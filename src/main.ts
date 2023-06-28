@@ -1,8 +1,8 @@
 import * as Fastify from 'fastify';
 import * as FastifyMiddie from '@fastify/middie';
 import type { Server } from 'http';
-import { ConsoleColors, Logger, LoggerConfig } from './logger';
-import { HttpException, HttpStatus } from './http-error';
+import { ConsoleColors, Logger, type LoggerConfig } from './logger';
+import { type HttpException, HttpStatus } from './http-error';
 import type { Controller, Middleware } from './rest';
 import type { Module } from './module';
 
