@@ -38,7 +38,8 @@
   "homepage": "https://github.com/bbanez/servaljs",
   "peerDependencies": {
     "@fastify/mongodb": "^7.0.0",
-    "mongodb": "^5.6.0"
+    "mongodb": "^5.6.0",
+    "servaljs": ">=0.1.2"
   },
   "devDependencies": {
     "@banez/child_process": "^1.0.3",
