@@ -219,28 +219,6 @@ export async function createServal(config: ServalConfig) {
     await initializeControllers(config.controllers);
   }
 
-  fastify.get(
-    '/',
-    {
-      schema: {
-        response: {
-          '200': {
-            type: 'object',
-            properties: {
-              bane: {
-                type: 'string',
-              },
-            },
-          },
-        },
-      },
-    },
-    () => {
-      return {
-        bane: 1,
-      };
-    },
-  );
   modules.push(
     {
       name: 'Serval Initialize',
