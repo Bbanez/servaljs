@@ -139,6 +139,16 @@ export function createMongoDBRepository<
             return;
           }
           intf = fastify.mongo.db.collection(config.collection);
+          if (config.methods) {
+            self.methods = config.methods({
+              name: config.name,
+              collection: config.collection,
+              schema: config.schema,
+              repo: self,
+              logger,
+              mdb: intf,
+            });
+          }
           next();
         },
       };
@@ -185,7 +195,9 @@ export function createMongoDBRepository<
       if (!manualCU) {
         entry.updatedAt = Date.now();
       }
-      await intf.updateOne({ _id: entry._id } as Filter<Entry>, entry);
+      await intf.updateOne({ _id: entry._id } as Filter<Entry>, {
+        $set: entry,
+      });
       return entry;
     },
     async updateMany(entries, manualCU) {
@@ -213,15 +225,5 @@ export function createMongoDBRepository<
       return await intf.countDocuments();
     },
   };
-  if (config.methods) {
-    self.methods = config.methods({
-      name: config.name,
-      collection: config.collection,
-      schema: config.schema,
-      repo: self,
-      logger,
-      mdb: intf,
-    });
-  }
   return self;
 }
