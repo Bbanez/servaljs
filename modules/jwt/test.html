@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <h1>Test</h1>
+    <button onclick="send()">Click</button>
+    <script>
+      const socket = new WebSocket('ws://localhost:1280/socket');
+
+      // Connection opened
+      socket.addEventListener('open', (event) => {
+        socket.send(JSON.stringify({ en: 'test', ed: { message: 'Hey' } }));
+      });
+
+      // Listen for messages
+      socket.addEventListener('message', (event) => {
+        console.log('Message from server ', event.data);
+      });
+
+      function send() {
+        socket.send('Yooo');
+      }
+    </script>
+  </body>
+</html>
