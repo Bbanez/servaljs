@@ -1,0 +1,74 @@
+{
+  "name": "servaljs-redis",
+  "version": "0.0.1",
+  "description": "ServalJS Redis module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "build:ts": "tsc -p .",
+    "bundle": "npm-tool --bundle",
+    "publish": "npm-tool --publish",
+    "link": "npm-tool --link",
+    "link:sudo": "npm-tool --link --sudo",
+    "unlink": "npm-tool --unlink",
+    "unlink:sudo": "npm-tool --unlink --sudo",
+    "pack": "npm-tool --pack",
+    "typedoc": "typedoc",
+    "test": "mocha -r ts-node/register src/test/integration/*.test.ts -r tsconfig-paths/register --recursive --exit",
+    "test:active": "mocha -r ts-node/register src/test/integration/*.active.test.ts --recursive --exit --bail",
+    "test:unit": "mocha -r ts-node/register src/test/unit/*.test.ts --recursive --exit",
+    "test:active:unit": "mocha -r ts-node/register src/test/unit/*.active.test.ts --recursive --exit",
+    "lint": "eslint . --ext .ts",
+    "t": "nodemon -r tsconfig-paths/register src/test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbanez/servaljs.git"
+  },
+  "keywords": [
+    "fastify",
+    "redis"
+  ],
+  "author": "Branislav Vajagić",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bbanez/servaljs/issues"
+  },
+  "homepage": "https://github.com/bbanez/servaljs",
+  "peerDependencies": {
+    "servaljs": ">=0.1.2",
+    "redis": ">=4.6.7"
+  },
+  "devDependencies": {
+    "@banez/child_process": "^1.0.3",
+    "@banez/npm-tool": "^1.0.1",
+    "@fastify/middie": "^8.3.0",
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^20.3.1",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "chai": "^4.3.4",
+    "dotenv": "^16.3.1",
+    "eslint": "^7.27.0",
+    "fastify": "^4.18.0",
+    "mocha": "^10.0.0",
+    "mongodb": "^5.6.0",
+    "prettier": "^2.7.1",
+    "redis": "^4.6.7",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^4.9.5"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "examples",
+      "src",
+      "test"
+    ],
+    "ext": "ts"
+  },
+  "dependencies": {
+    "@banez/object-utility": "^1.0.1"
+  }
+}

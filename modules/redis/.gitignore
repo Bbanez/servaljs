@@ -1,0 +1,51 @@
+# compiled output
+/dist
+/doc
+/node_modules
+/typedoc
+/_test
+/_test2
+
+# Environment
+
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Test temp
+_test
+/test/assets/db/_*
+/.fsdb.json
+
+examples/login/rest/.fsdb.json
+examples/login/graphql/.fsdb.json

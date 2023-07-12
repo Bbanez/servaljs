@@ -1,0 +1,10 @@
+GET http://localhost:1280/todo/all
+
+###
+
+POST http://localhost:1280/todo/
+Content-Type: application/json
+
+{
+  "desc": "Test 1"
+}
