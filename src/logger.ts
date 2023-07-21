@@ -213,7 +213,29 @@ function toOutput(messageParts: string, type: 'log' | 'warn' | 'error') {
 }
 
 export class Logger {
-  constructor(public name: string) {}
+  constructor(public name: string) {
+    this.infoMsg = [
+      `${ConsoleColors.FgWhite}[INFO]${ConsoleColors.Reset}`,
+      `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
+      `${ConsoleColors.FgMagenta}@place${ConsoleColors.Reset}`,
+      '>',
+      '@print',
+    ].join(' ');
+    this.warnMsg = [
+      `${ConsoleColors.FgYellow}[WARN]${ConsoleColors.Reset}`,
+      `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
+      `${ConsoleColors.FgMagenta}@place${ConsoleColors.Reset}`,
+      '>',
+      '@print',
+    ].join(' ');
+    this.errMsg = [
+      `${ConsoleColors.BgRed}[ERROR]${ConsoleColors.Reset}`,
+      `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
+      `${ConsoleColors.FgMagenta}@place${ConsoleColors.Reset}`,
+      '>',
+      '@print',
+    ].join(' ');
+  }
 
   private infoMsg = [
     `${ConsoleColors.FgWhite}[INFO]${ConsoleColors.Reset}`,
