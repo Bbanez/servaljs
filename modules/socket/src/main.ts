@@ -17,23 +17,29 @@ export class ServalSocketManager {
     [id: string]: ServalSocketConnection;
   } = {};
 
-  static channelEmit(
+  static channelEmit<Data = unknown>(
     channels: string[],
     eventName: string,
-    eventData: unknown,
+    eventData: Data,
+    excludeConnections?: string[],
   ): void {
+    if (!excludeConnections) {
+      excludeConnections = [];
+    }
     Object.keys(ServalSocketManager.conns).forEach((id) => {
       const conn = ServalSocketManager.conns[id];
-      let found = false;
-      for (let i = 0; i < channels.length; i++) {
-        const channel = channels[i];
-        if (conn.channels.includes(channel)) {
-          found = true;
-          break;
+      if (!(excludeConnections as string[]).includes(id)) {
+        let found = false;
+        for (let i = 0; i < channels.length; i++) {
+          const channel = channels[i];
+          if (conn.channels.includes(channel)) {
+            found = true;
+            break;
+          }
         }
-      }
-      if (found) {
-        conn.emit(eventName, eventData);
+        if (found) {
+          conn.emit(eventName, eventData);
+        }
       }
     });
   }
