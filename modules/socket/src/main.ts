@@ -16,6 +16,27 @@ export class ServalSocketManager {
   static conns: {
     [id: string]: ServalSocketConnection;
   } = {};
+
+  static channelEmit(
+    channels: string[],
+    eventName: string,
+    eventData: unknown,
+  ): void {
+    Object.keys(ServalSocketManager.conns).forEach((id) => {
+      const conn = ServalSocketManager.conns[id];
+      let found = false;
+      for (let i = 0; i < channels.length; i++) {
+        const channel = channels[i];
+        if (conn.channels.includes(channel)) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        conn.emit(eventName, eventData);
+      }
+    });
+  }
 }
 
 export interface ServalSocketEvent {
@@ -49,7 +70,10 @@ export interface ServalSocketConfig {
     },
     next: (ok: boolean) => void,
   ): Promise<void> | void;
-  onConnection?(connection: ServalSocketConnection): Promise<void> | void;
+  onConnection?(
+    connection: ServalSocketConnection,
+    request: FastifyRequest,
+  ): Promise<void> | void;
   onDisconnect?(connection: ServalSocketConnection): Promise<void> | void;
   onMessage?(message: Buffer): Promise<void> | void;
 }
@@ -76,7 +100,7 @@ export function createServalSocket(config: ServalSocketConfig): Module {
           fastify.get(
             config.path,
             { websocket: true },
-            async (connection, _req) => {
+            async (connection, req) => {
               const id = crypto
                 .createHash('sha1')
                 .update(Date.now() + crypto.randomBytes(8).toString('base64'))
@@ -93,7 +117,7 @@ export function createServalSocket(config: ServalSocketConfig): Module {
               };
               logger.info('', `New socket connection "${id}"`);
               if (config.onConnection) {
-                await config.onConnection(ServalSocketManager.conns[id]);
+                await config.onConnection(ServalSocketManager.conns[id], req);
               }
               connection.socket.on('message', async (message: Buffer) => {
                 const msg = message.toString();
