@@ -65,6 +65,7 @@ export interface ControllerMethodConfig<
 }
 
 export type ControllerMethodPreRequestHandlerData = {
+  controllerName: string;
   /**
    * Name of the method
    */
@@ -96,6 +97,7 @@ export type ControllerMethodPreRequestHandler<
 ) => Promise<PreRequestHandlerResult>;
 
 export type ControllerMethodRequestHandlerData = {
+  controllerName: string;
   /**
    * Name of the method
    */
@@ -192,7 +194,7 @@ function wrapControllerMethod<
   PreRequestHandlerResult = unknown,
   ReturnType = unknown,
 >(
-  _controller: ControllerConfig,
+  controller: ControllerConfig,
   path: string,
   logger: Logger,
   methodName: string,
@@ -217,6 +219,7 @@ function wrapControllerMethod<
       let preRequestHandlerResult: PreRequestHandlerResult = {} as never;
       if (config.preRequestHandler) {
         preRequestHandlerResult = await config.preRequestHandler({
+          controllerName: controller.name,
           logger,
           errorHandler,
           name,
@@ -225,6 +228,7 @@ function wrapControllerMethod<
         });
       }
       return await config.handler({
+        controllerName: controller.name,
         logger,
         errorHandler,
         request,
