@@ -20,6 +20,7 @@ export type ControllerMethodType = 'get' | 'post' | 'put' | 'delete' | 'head';
  * Object returned from the `createControllerMethod` function.
  */
 export interface ControllerMethod {
+  name: string;
   type: ControllerMethodType;
   path: string;
   fastifyRouteOptions: RouteShorthandOptions;
@@ -208,6 +209,7 @@ function wrapControllerMethod<
   // const fullPath = controller.path + path;
 
   return {
+    name,
     type: config.type,
     path,
     fastifyRouteOptions: config.options || {},
@@ -261,7 +263,7 @@ export function createController(config: ControllerConfig): Controller {
             config,
             method.path || '',
             logger,
-            methodNames[i],
+            methodName,
             {
               type: method.type,
               preRequestHandler: method.preRequestHandler,
