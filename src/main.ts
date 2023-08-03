@@ -82,7 +82,7 @@ export async function createServal(config: ServalConfig) {
           fastify,
         });
         logger.info('controller', `${data.name}`);
-        let methods = data.methods();
+        let methods = data.methods(data);
         if (methods instanceof Promise) {
           methods = await methods;
         }

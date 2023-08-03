@@ -153,7 +153,10 @@ export interface ControllerConfig {
    * called after `setup` method, and output from it is passed as a
    * parameter.
    */
-  methods(): Promise<ControllerMethods> | ControllerMethods;
+  methods(config: {
+    controllerName: string;
+    basePath: string;
+  }): Promise<ControllerMethods> | ControllerMethods;
 }
 
 export type Controller = (data: {
@@ -176,7 +179,9 @@ export interface ControllerData {
    */
   path: string;
   logger: Logger;
-  methods(): Promise<ControllerMethod[]> | ControllerMethod[];
+  methods(
+    config: Omit<ControllerData, 'methods'>,
+  ): Promise<ControllerMethod[]> | ControllerMethod[];
 }
 
 /**
@@ -253,7 +258,10 @@ export function createController(config: ControllerConfig): Controller {
     }
 
     async function getMethods() {
-      let configMethods = config.methods();
+      let configMethods = config.methods({
+        controllerName: config.name,
+        basePath: config.path,
+      });
       if (configMethods instanceof Promise) {
         configMethods = await configMethods;
       }
