@@ -263,17 +263,12 @@ export function createController(config: ControllerConfig): Controller {
         const methodName = methodNames[i];
         const method = configMethods[methodName];
         methods.push(
-          wrapControllerMethod(
-            config,
-            method.path || '',
-            logger,
-            methodName,
-            {
-              type: method.type,
-              preRequestHandler: method.preRequestHandler,
-              handler: method.handler,
-            },
-          ),
+          wrapControllerMethod(config, method.path || '', logger, methodName, {
+            type: method.type,
+            options: method.options,
+            preRequestHandler: method.preRequestHandler,
+            handler: method.handler,
+          }),
         );
       }
       return methods;
