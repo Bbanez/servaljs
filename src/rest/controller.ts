@@ -232,7 +232,7 @@ function wrapControllerMethod<
           replay,
         });
       }
-      return await config.handler({
+      const res = await config.handler({
         controllerName: controller.name,
         logger,
         errorHandler,
@@ -241,6 +241,11 @@ function wrapControllerMethod<
         name,
         ...preRequestHandlerResult,
       });
+      if (typeof res === 'object') {
+        replay.header('Content-Type', 'application/json');
+        return JSON.stringify(res);
+      }
+      return res;
     },
   };
 }
