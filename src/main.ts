@@ -100,11 +100,17 @@ export async function createServal(config: ServalConfig) {
               if (exception.status && exception.message) {
                 logger.warn(request.url, error);
                 if (typeof exception.message === 'object') {
-                  replay.code(exception.status).send(exception.message);
-                } else {
+                  replay.header('Content-Type', 'application/json');
                   replay
                     .code(exception.status)
-                    .send({ message: exception.message });
+                    .send(JSON.stringify(exception.message));
+                  return;
+                } else {
+                  replay.header('Content-Type', 'application/json');
+                  replay
+                    .code(exception.status)
+                    .send(JSON.stringify({ message: exception.message }));
+                  return;
                 }
               } else {
                 logger.error(request.url, {
@@ -117,7 +123,10 @@ export async function createServal(config: ServalConfig) {
                       : '',
                   },
                 });
-                replay.code(500).send({ message: 'Unknown exception' });
+                replay
+                  .code(500)
+                  .send(JSON.stringify({ message: 'Unknown exception' }));
+                return;
               }
             };
           }
