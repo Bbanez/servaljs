@@ -1,6 +1,6 @@
 {
   "name": "servaljs-jwt",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "ServalJS JWT module",
   "main": "./index.js",
   "types": "./index.d.ts",
