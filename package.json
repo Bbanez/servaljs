@@ -1,6 +1,6 @@
 {
   "name": "servaljs",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "ServalJS is a toolset for FastifyJS",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -25,7 +25,14 @@
     "type": "git",
     "url": "git+https://github.com/bbanez/servaljs.git"
   },
-  "keywords": [],
+  "keywords": [
+    "fastify",
+    "node",
+    "nodejs",
+    "web",
+    "tool",
+    "toolset"
+  ],
   "author": "Branislav Vajagić",
   "license": "MIT",
   "bugs": {
