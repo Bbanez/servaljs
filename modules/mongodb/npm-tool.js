@@ -27,8 +27,8 @@ module.exports = createConfig({
               ['dist', file],
             );
           }
-          await fs.deleteFile(['dist', 'test.js']);
-          await fs.deleteFile(['dist', 'test.d.ts']);
+          await fs.deleteFile(['dist', 'example.js']);
+          await fs.deleteFile(['dist', 'example.d.ts']);
           await fs.deleteDir(['dist', 'modules']);
         },
       },

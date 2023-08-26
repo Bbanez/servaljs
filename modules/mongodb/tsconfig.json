@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "servaljs": ["../../src"],
-      "servaljs/*": ["../../src/*"]
+      "servaljs/*": ["../../src/*"],
+      "servaljs-mongodb": ["./src"]
     }
   },
   "include": ["src", "../../src"]
