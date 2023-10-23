@@ -113,19 +113,26 @@ export async function createServal(config: ServalConfig) {
                   return;
                 }
               } else {
+                const stack = (error as Error).stack
+                  ? ((error as Error).stack as string).split('\n')
+                  : [''];
                 logger.error(request.url, {
                   method: request.method,
                   path: request.url,
                   error: {
                     message: (error as Error).message,
-                    stack: (error as Error).stack
-                      ? ((error as Error).stack as string).split('\n')
-                      : '',
+                    stack: stack,
                   },
                 });
-                replay
-                  .code(500)
-                  .send(JSON.stringify({ message: 'Unknown exception' }));
+                if (stack.join(' ').includes('fastify/lib/validation.js')) {
+                  replay
+                    .code(400)
+                    .send(JSON.stringify({ message: error.message }));
+                } else {
+                  replay
+                    .code(500)
+                    .send(JSON.stringify({ message: 'Unknown exception' }));
+                }
                 return;
               }
             };
