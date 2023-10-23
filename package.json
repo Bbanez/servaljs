@@ -1,6 +1,6 @@
 {
   "name": "servaljs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ServalJS is a toolset for FastifyJS",
   "main": "./index.js",
   "types": "./index.d.ts",
