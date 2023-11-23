@@ -99,14 +99,14 @@ export class JWTManager {
         }
         break;
     }
-    hmac.setEncoding('base64');
+    hmac.setEncoding('base64url');
     hmac.write(header + '.' + payload);
     hmac.end();
 
     return {
       header: jwt.header,
       payload: jwt.payload,
-      signature: JWTEncode.b64Url(hmac.read().toString()),
+      signature: hmac.read().toString(),
     };
   }
 
