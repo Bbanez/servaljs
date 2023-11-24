@@ -1,7 +1,12 @@
 import * as Fastify from 'fastify';
 import * as FastifyMiddie from '@fastify/middie';
 import type { Server } from 'http';
-import { ConsoleColors, Logger, type LoggerConfig } from './logger';
+import {
+  ConsoleColors,
+  Logger,
+  createLogger,
+  type LoggerConfig,
+} from './logger';
 import { type HttpException, HttpStatus } from './http-error';
 import type { Controller, Middleware } from './rest';
 import type { Module } from './module';
@@ -51,6 +56,9 @@ export async function createServal(config: ServalConfig) {
     config.modules = [];
   }
   const modules = config.modules;
+  if (config.logs) {
+    modules.push(createLogger(config.logs));
+  }
   if (config.errorHandler) {
     fastify.setErrorHandler(config.errorHandler);
   } else {
