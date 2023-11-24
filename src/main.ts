@@ -55,9 +55,9 @@ export async function createServal(config: ServalConfig) {
   if (!config.modules) {
     config.modules = [];
   }
-  const modules = config.modules;
+  let modules = config.modules;
   if (config.logs) {
-    modules.push(createLogger(config.logs));
+    modules = [createLogger(config.logs), ...modules];
   }
   if (config.errorHandler) {
     fastify.setErrorHandler(config.errorHandler);

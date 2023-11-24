@@ -22,6 +22,7 @@ export interface LoggerConfig {
   silent?: boolean;
   silentLogger?: boolean;
   doNotOverrideProcess?: boolean;
+  onlyStderrToConsole?: boolean;
   saveToFile?: {
     output: string;
     interval: number;
@@ -154,9 +155,13 @@ export function createLogger(config?: LoggerConfig): Module {
             ].join(' ');
             str = config && config.doNotOverrideProcess ? str : output;
             outputBuffer.push(output);
-            write.apply(process[type], [str, encoding, cb]);
-            if (config && config.onMessage) {
-              config.onMessage({ data: str, type });
+            if (config) {
+              if (type !== 'stdout' || !config.onlyStderrToConsole) {
+                write.apply(process[type], [str, encoding, cb]);
+              }
+              if (config.onMessage) {
+                config.onMessage({ data: str, type });
+              }
             }
           }
           return true;
@@ -213,7 +218,9 @@ function toOutput(messageParts: string, type: 'log' | 'warn' | 'error') {
 }
 
 export class Logger {
-  constructor(public name: string) {
+  public name = 'Logger';
+  constructor(name: string) {
+    this.name = name;
     this.infoMsg = [
       `${ConsoleColors.FgWhite}[INFO]${ConsoleColors.Reset}`,
       `${ConsoleColors.Bright}${ConsoleColors.FgMagenta}${this.name}${ConsoleColors.Reset}`,
