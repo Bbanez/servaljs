@@ -1,6 +1,6 @@
 {
   "name": "servaljs-jwt",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ServalJS JWT module",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/bbanez/servaljs",
   "peerDependencies": {
-    "servaljs": ">=0.1.2"
+    "servaljs": ">=1.0.0"
   },
   "devDependencies": {
     "@banez/child_process": "^1.0.3",
