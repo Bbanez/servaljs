@@ -1,6 +1,6 @@
 {
   "name": "servaljs-mongodb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ServalJS MongoDB interface module",
   "main": "./index.js",
   "types": "./index.d.ts",
