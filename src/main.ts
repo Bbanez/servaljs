@@ -8,7 +8,7 @@ import {
   type LoggerConfig,
 } from './logger';
 import { type HttpException, HttpStatus } from './http-error';
-import type { Controller, Middleware } from './rest';
+import type { Controller, ControllerData, Middleware } from './rest';
 import type { Module } from './module';
 
 export interface ServalServer
@@ -27,6 +27,13 @@ export interface ServalConfig extends Fastify.FastifyHttpOptions<Server> {
     req: Fastify.FastifyRequest,
     replay: Fastify.FastifyReply,
   ): Promise<void> | void;
+  defaultControllerErrorHandler?(
+    data: ControllerData,
+  ): (
+    error: Fastify.FastifyError,
+    request: Fastify.FastifyRequest,
+    reply: Fastify.FastifyReply,
+  ) => void;
   notFoundHandler?(
     req: Fastify.FastifyRequest,
     replay: Fastify.FastifyReply,
@@ -99,51 +106,56 @@ export async function createServal(config: ServalConfig) {
           const path = (data.path + method.path).replace(/\/\//g, '/');
           logger.info('controller', `    --> ${path}`);
           if (!method.fastifyRouteOptions.errorHandler) {
-            method.fastifyRouteOptions.errorHandler = async (
-              error,
-              request,
-              replay,
-            ) => {
-              const exception = error as unknown as HttpException;
-              if (exception.status && exception.message) {
-                logger.warn(request.url, error);
-                if (typeof exception.message === 'object') {
-                  replay.header('Content-Type', 'application/json');
-                  replay
-                    .code(exception.status)
-                    .send(JSON.stringify(exception.message));
-                  return;
+            if (config.defaultControllerErrorHandler) {
+              method.fastifyRouteOptions.errorHandler =
+                config.defaultControllerErrorHandler(data);
+            } else {
+              method.fastifyRouteOptions.errorHandler = async (
+                error,
+                request,
+                replay,
+              ) => {
+                const exception = error as unknown as HttpException;
+                if (exception.status && exception.message) {
+                  logger.warn(request.url, error);
+                  if (typeof exception.message === 'object') {
+                    replay.header('Content-Type', 'application/json');
+                    replay
+                      .code(exception.status)
+                      .send(JSON.stringify(exception.message));
+                    return;
+                  } else {
+                    replay.header('Content-Type', 'application/json');
+                    replay
+                      .code(exception.status)
+                      .send(JSON.stringify({ message: exception.message }));
+                    return;
+                  }
                 } else {
-                  replay.header('Content-Type', 'application/json');
-                  replay
-                    .code(exception.status)
-                    .send(JSON.stringify({ message: exception.message }));
+                  const stack = (error as Error).stack
+                    ? ((error as Error).stack as string).split('\n')
+                    : [''];
+                  logger.error(request.url, {
+                    method: request.method,
+                    path: request.url,
+                    error: {
+                      message: (error as Error).message,
+                      stack: stack,
+                    },
+                  });
+                  if (stack.join(' ').includes('fastify/lib/validation.js')) {
+                    replay
+                      .code(400)
+                      .send(JSON.stringify({ message: error.message }));
+                  } else {
+                    replay
+                      .code(500)
+                      .send(JSON.stringify({ message: 'Unknown exception' }));
+                  }
                   return;
                 }
-              } else {
-                const stack = (error as Error).stack
-                  ? ((error as Error).stack as string).split('\n')
-                  : [''];
-                logger.error(request.url, {
-                  method: request.method,
-                  path: request.url,
-                  error: {
-                    message: (error as Error).message,
-                    stack: stack,
-                  },
-                });
-                if (stack.join(' ').includes('fastify/lib/validation.js')) {
-                  replay
-                    .code(400)
-                    .send(JSON.stringify({ message: error.message }));
-                } else {
-                  replay
-                    .code(500)
-                    .send(JSON.stringify({ message: 'Unknown exception' }));
-                }
-                return;
-              }
-            };
+              };
+            }
           }
           fastify[method.type](
             path,
