@@ -10,6 +10,7 @@ import {
 import { type HttpException, HttpStatus } from './http-error';
 import type { Controller, ControllerData, Middleware } from './rest';
 import type { Module } from './module';
+import type { OpenAPIV3 } from 'openapi-types';
 
 export interface ServalServer
   extends Omit<Fastify.FastifyListenOptions, 'port'> {
@@ -42,6 +43,7 @@ export interface ServalConfig extends Fastify.FastifyHttpOptions<Server> {
   middleware?: Middleware[];
   modules?: Module[];
   logs?: LoggerConfig;
+  openApi?: Omit<OpenAPIV3.Document, 'paths'>;
 }
 
 export interface Serval {
@@ -53,6 +55,13 @@ export async function createServal(config: ServalConfig) {
   const rootTimeOffset = Date.now();
   const logger = new Logger('Serval');
   const fastify = Fastify(config);
+  const openApi = config.openApi
+    ? (config.openApi as OpenAPIV3.Document)
+    : undefined;
+  if (openApi) {
+    openApi.paths = {};
+  }
+  config.openApi = openApi;
   if (!config.controllers) {
     config.controllers = [];
   }
@@ -162,6 +171,24 @@ export async function createServal(config: ServalConfig) {
             method.fastifyRouteOptions,
             method.handler,
           );
+          if (openApi && method.openApi) {
+            const pathParts = path.split('/');
+            const openApiPath = pathParts
+              .map((part) => {
+                if (part.startsWith(':')) {
+                  return '{' + part.replace(/:/g, '') + '}';
+                }
+                return part;
+              })
+              .join('/');
+            if (!openApi.paths[openApiPath]) {
+              openApi.paths[openApiPath] = {};
+            }
+            const paths = openApi.paths[openApiPath];
+            if (paths) {
+              paths[method.type] = method.openApi;
+            }
+          }
         }
       }
     }

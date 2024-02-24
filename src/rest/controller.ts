@@ -10,6 +10,7 @@ import type {
   FastifyRequest,
   RouteShorthandOptions,
 } from 'fastify';
+import type { OpenAPIV3 } from 'openapi-types';
 
 /**
  * HTTP method type.
@@ -24,6 +25,7 @@ export interface ControllerMethod {
   type: ControllerMethodType;
   path: string;
   fastifyRouteOptions: RouteShorthandOptions;
+  openApi?: OpenAPIV3.OperationObject;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handler: (request: FastifyRequest, replay: FastifyReply) => Promise<any>;
 }
@@ -62,6 +64,7 @@ export interface ControllerMethodConfig<
    * then returning a Buffer because it uses response stream.
    */
   handler: ControllerMethodRequestHandler<PreRequestHandlerResult, ReturnType>;
+  openApi?: OpenAPIV3.OperationObject,
 }
 
 export type ControllerMethodPreRequestHandlerData = {
@@ -220,6 +223,7 @@ function wrapControllerMethod<
     type: config.type,
     path,
     fastifyRouteOptions: config.options || {},
+    openApi: config.openApi,
     handler: async (request, replay) => {
       let preRequestHandlerResult: PreRequestHandlerResult = {} as never;
       if (config.preRequestHandler) {
@@ -279,6 +283,7 @@ export function createController(config: ControllerConfig): Controller {
           wrapControllerMethod(config, method.path || '', logger, methodName, {
             type: method.type,
             options: method.options,
+            openApi: method.openApi,
             preRequestHandler: method.preRequestHandler,
             handler: method.handler,
           }),
